@@ -49,11 +49,11 @@
       readerSize: {
         width: {
           type: Number,
-          default: 200,
+          default: 640,
         },
         height: {
           type: Number,
-          default: 300,
+          default: 480,
         }
       }
     },
@@ -150,12 +150,17 @@
     el: "#app",
     data: {
       readerSize: {
-        width: 640,
-        height: 480
+        width: 200,
+        height: 300
       },
       codeResult: null
     },
-    
+    mounted() {
+      if ( window.matchMedia('min-width: 640px').matches ) {
+        this.readerSize.width = 640
+        this.readerSize.width = 480
+      }
+    },
     methods: {
       logIt(data) {
         console.log('detected', data)
