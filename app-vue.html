@@ -159,8 +159,7 @@
     methods: {
       logIt(data) {
         console.log('detected', data)
-        window.alert('detected: ', data);
-        this.codeResult = data
+        this.codeResult = data.codeResult.code
       },
     }
   })
