@@ -15,10 +15,16 @@
             console.log(`Code scanned = ${decodedText}`, decodedResult);
         }
 
+        const formatsToSupport = [
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+        ];
+
         const config = {
             fps: 10, 
             qrbox: 250,
-            formatsToSupport: ['EAN_13']
+            formatsToSupport: formatsToSupport
         }
 
         var html5QrcodeScanner = new Html5QrcodeScanner("qr-reader", config);
