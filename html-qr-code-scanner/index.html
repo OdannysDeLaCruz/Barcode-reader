@@ -8,11 +8,15 @@
 </head>
 <body>
     <div id="qr-reader" style="width: 600px"></div>
+    <div>
+        Result: <p id="decodedResult"></p>
+    </div>
 
     <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
     <script>
         function onScanSuccess(decodedText, decodedResult) {
             console.log(`Code scanned = ${decodedText}`, decodedResult);
+            document.getElementById('decodedResult').innerHTML = `Resultado: ${ decodedText }`
         }
 
         const formatsToSupport = [
