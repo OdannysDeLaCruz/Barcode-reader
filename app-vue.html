@@ -19,13 +19,21 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@carloscgo/vue-cc-quaggajs@2.0.0/dist/vue-quagga.js"></script>
 <script src="https://cdn.rawgit.com/serratus/quaggaJS/0420d5e0/dist/quagga.min.js"></script>
+
 <div id="app">
-  <quagga-scanner :on-detected="logIt" :reader-size="readerSize" :reader-type="'ean_reader'"></quagga-scanner>
+    <div>
+        <quagga-scanner :on-detected="logIt" :reader-size="readerSize" :reader-type="'ean_reader'"></quagga-scanner>
+    </div>
+
+    <!-- Result -->
+    <div>
+        Barcode result: {{ codeResult }}
+    </div>
 </div>
 
 
+
 <script>
-alert('Montado')
   Vue.component('quagga-scanner', {
     props: {
       onDetected: {
@@ -144,13 +152,15 @@ alert('Montado')
       readerSize: {
         width: 640,
         height: 480
-      }
+      },
+      codeResult: null
     },
     
     methods: {
       logIt(data) {
         console.log('detected', data)
-        window.alert('detected: ', result);
+        window.alert('detected: ', data);
+        this.codeResult = data
       },
     }
   })
