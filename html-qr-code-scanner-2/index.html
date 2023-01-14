@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div class="qr-reader">
+        <div class="qr-reader__viewport">
+            <div id="viewport" style="width: 600px;"></div>
+        </div>
+        <div class="qr-reader__dashboard">
+            <!-- Requeste camera permissions -->
+            <button class="qr-reader__button qr-reader__button--primary" id="QRReaderRequestPermissionButton">Abrir La Cámara</button>
+            <!-- Devices list -->
+            <div class="qr-reader__devices" id="QRReaderDevicesSection" style="display: block;">
+                <span>Selecciona una cámara</span>
+                <select class="qr-reader__devices-list" id="QRReaderDeviceSelecList"></select>
+                <button class="qr-reader__button qr-reader__button--primary" id="QRReaderStartScannerButton">Escanear</button>
+            </div>
+
+            <button class="qr-reader__button qr-reader__button--simple" id="QRReaderGetFromDevice">Escanear imagen desde el dispositivo</button>
+            <!--  -->
+            <div class="qr-reader__from-device" id="QRReaderGetImageSection" style="display: none;">
+                <input class="qr-reader__input" type="file" accept="image/*" capture>
+            </div>
+        </div>
+    </div>
+
+    
+    <div><p id="decodedResult"></p></div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.0.9/dist/html5-qrcode.min.js"></script>
+    <script>
+        "use strict";
+
+        const QRReaderRequestPermissionButton = document.getElementById('QRReaderRequestPermissionButton')
+        const QRReaderDeviceSelecList = document.getElementById('QRReaderDeviceSelecList')
+        const QRReaderStartScannerButton = document.getElementById('QRReaderStartScannerButton')
+        const QRReaderDevicesSection = document.getElementById('QRReaderDevicesSection')
+        let cameraId = undefined
+        let decodedResult = null
+
+        const formatsToSupport = [
+            Html5QrcodeSupportedFormats.QR_CODE,
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+        ]
+
+        const config = {
+            fps: 24,
+            qrbox: 300,
+            formatsToSupport: formatsToSupport
+        }
+
+        function onScanSuccess(decodedText, decodedResult) {
+            console.log(`Code scanned = ${decodedText}`, decodedResult);
+            document.getElementById('decodedResult').innerHTML = `Resultado: ${ decodedText }`
+        }
+
+        function createDeviceOption(device) {
+            return `<option value="${device.id}" ${device.selected ? "selected" : ''}>${device.label}</option>`
+        }
+
+        function renderDeviceSelectList(deviceList) {
+            deviceList.unshift(createDeviceOption({id: 0, label: 'Selecciona una cámara', selected: true}))
+            QRReaderDeviceSelecList.innerHTML = deviceList.reduce((accumulate, current) =>  accumulate + current )
+        }
+
+        function addOnChangeEventToDeviceList(callback) {
+            QRReaderDeviceSelecList.addEventListener('change', event => {
+                callback(event.target.value)
+            })
+        }
+
+        function getCameras(callback) {
+            /**
+             * This method will trigger user permissions
+             * devices would be an array of objects of type:
+             * { id: "id", label: "label" }
+             */
+            Html5Qrcode.getCameras()
+            .then(devices => {
+                if ( devices ) {
+                    const deviceList = devices.map(device => createDeviceOption(device))
+                    renderDeviceSelectList(deviceList)
+                    addOnChangeEventToDeviceList(function(cameraId) {
+                        callback(cameraId)
+                    })
+                } else {
+                    console.log('No hay camaras disponibles')
+                }
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
+
+        function html5QrCodeStart() {
+            const html5QrCode = new Html5Qrcode("viewport")
+
+            html5QrCode.start(cameraId, config, onScanSuccess)                
+            .catch((err) => console.log(err))
+        }
+
+        function init() {
+             QRReaderRequestPermissionButton.addEventListener('click', function() {
+                QRReaderDevicesSection.style.display = 'block'
+
+                getCameras(function(camera_id) {
+                    if ( camera_id != '0' ) {
+                        cameraId = camera_id
+                        console.log(cameraId)
+                    } else {
+                        cameraId = undefined
+                    }
+                })
+             })
+
+             QRReaderStartScannerButton.addEventListener('click', function() {
+                if ( cameraId ) {
+                    html5QrCodeStart()
+                } else {
+                    alert('Por favor, selecciona una Cámara.')
+                }
+             })
+        }
+
+        init()
+    </script>
+</body>
+</html>
